@@ -1,6 +1,7 @@
 <template>
   <div class="chart">
-    <canvas id="ExchageRatesChart" width="400" height="400"></canvas>
+    <canvas id="ExchageRatesChart" width="1000" height="700"></canvas>
+    <button v-on:click="refresh">resetZoom</button>
   </div>
 </template>
 
@@ -12,10 +13,22 @@ import jsonData from "../../../tempData/exchagerates.json";
 import Vue from "vue";
 
 export default Vue.extend({
+  data() {
+    return {
+      ctx: "",
+      config: "",
+      chart: Object,
+    };
+  },
+  methods: {
+    refresh() {
+      this.chart.resetZoom();
+    },
+  },
   mounted() {
-    const ctx = document.getElementById("ExchageRatesChart");
+    this.ctx = document.getElementById("ExchageRatesChart");
 
-    const config = {
+    this.config = {
       type: "line",
       data: {
         labels: [],
@@ -50,14 +63,13 @@ export default Vue.extend({
             beginAtZero: false,
           },
         },
-        scrollingMode: "all",
         plugins: {
           zoom: {
+            pan: {
+              enabled: true,
+            },
             zoom: {
               wheel: {
-                enabled: true,
-              },
-              pinch: {
                 enabled: true,
               },
             },
@@ -67,11 +79,11 @@ export default Vue.extend({
     };
 
     jsonData.forEach((e) => {
-      config.data.datasets[0].data.push(Number(e.KRW));
-      config.data.labels.push(e.date);
+      this.config.data.datasets[0].data.push(Number(e.KRW));
+      this.config.data.labels.push(e.date);
     });
 
-    new Chart(ctx, config);
+    this.chart = new Chart(this.ctx, this.config);
   },
 });
 </script>
@@ -81,6 +93,6 @@ export default Vue.extend({
   float: left;
   padding: 2rem;
   border: 1px solid red;
-  width: 500px;
+  width: 1000px;
 }
 </style>
